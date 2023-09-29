@@ -1,0 +1,373 @@
+{
+	"info": {
+		"_postman_id": "ee21f604-ec0a-4cdb-b480-2371d3ae085e",
+		"name": "PracticeLibraryRandom1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25959645",
+		"_collection_link": "https://www.postman.com/red-escape-640407/workspace/rs-workspace/collection/25959645-ee21f604-ec0a-4cdb-b480-2371d3ae085e?action=share&source=collection_link&creator=25959645"
+	},
+	"item": [
+		{
+			"name": "AddBook1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// generate random values for isbn and aisle\r",
+							"const isbn_value = pm.variables.replaceIn(\"{{$randomAlphaNumeric}}\");\r",
+							"const aisle_value = pm.variables.replaceIn(\"{{$randomInt}}\");\r",
+							"\r",
+							"pm.collectionVariables.set(\"isbn\",isbn_value);\r",
+							"pm.collectionVariables.set(\"aisle\",aisle_value);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validate response status code is 200 OK\",function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"pm.test(\"Validate response time is less than 1500ms\",function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1500);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Valiadte Content Type header is present\",function(){\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"pm.test(\"Validate Content-Type header value is application/json\",()=>{\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json;charset=UTF-8\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response must be valid and have a body\",function(){\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"const jsonData = pm.response.json();\r",
+							"const schema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"Msg\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"ID\": {\r",
+							"      \"type\": \"string\"\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"Msg\",\r",
+							"    \"ID\"\r",
+							"  ]\r",
+							"}\r",
+							"pm.test(\"Validate Json schema\",function(){\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    pm.expect(tv4.validate(jsonData,schema)).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Json response properties\",function(){\r",
+							"    pm.expect(jsonData).to.have.property(\"Msg\");\r",
+							"    pm.expect(jsonData).to.have.property(\"ID\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response data type\",function(){\r",
+							"    pm.expect(jsonData).to.be.an(\"object\");\r",
+							"    pm.expect(jsonData.Msg).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.ID).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate json response values\",function(){\r",
+							"    pm.expect(jsonData.Msg).to.eql(\"successfully added\");\r",
+							"});\r",
+							"pm.test(\"Validate Body matches string\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"successfully added\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response ID logic\",function(){\r",
+							"    pm.expect(jsonData.ID).to.eql(pm.collectionVariables.get(\"isbn\")+ pm.collectionVariables.get(\"aisle\"));\r",
+							"    // used when request body values are hard coded\r",
+							"    const req = JSON.parse(pm.request.body.raw);\r",
+							"    pm.expect(jsonData.ID).to.eql(req.isbn+req.aisle);\r",
+							"});\r",
+							"\r",
+							"//create collection variable for ID\r",
+							"pm.collectionVariables.set(\"book_id\",jsonData.ID);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Selenium with Java\",\r\n    \"isbn\": \"{{isbn}}\",\r\n    \"aisle\": \"{{aisle}}\",\r\n    \"author\": \"John foe\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Library/Addbook.php",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Library",
+						"Addbook.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetBook1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validate response status code is 200 OK\",function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"pm.test(\"Validate response time is less than 1200ms\",function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1200);\r",
+							"});\r",
+							"pm.test(\"Validate response Content Type header\",function(){\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json;charset=UTF-8\");\r",
+							"});\r",
+							"pm.test(\"Response must be valid and have a body\",function(){\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"const schema = {\r",
+							"  \"type\": \"array\",\r",
+							"  \"items\": [\r",
+							"    {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"book_name\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"isbn\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"aisle\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"author\": {\r",
+							"          \"type\": \"string\"\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"book_name\",\r",
+							"        \"isbn\",\r",
+							"        \"aisle\",\r",
+							"        \"author\"\r",
+							"      ]\r",
+							"    }\r",
+							"  ]\r",
+							"}\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Validate Json Schema\",function(){\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    //or\r",
+							"    pm.expect(tv4.validate(jsonData,schema)).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Json response properties\",function(){\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"book_name\");\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"isbn\");\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"aisle\");\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"author\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Json response Data type\",function(){\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"    pm.expect(jsonData[0]).to.be.an(\"object\");\r",
+							"    pm.expect(jsonData[0].book_name).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData[0].isbn).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData[0].aisle).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData[0].author).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Json response values\",function(){\r",
+							"    pm.expect(jsonData[0].book_name).to.eql(\"Selenium with Java\");\r",
+							"    pm.expect(jsonData[0].author).to.eql(\"John foe\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate body matches String\",function(){\r",
+							"    pm.expect(pm.response.text()).to.include(\"Selenium with Java\");\r",
+							"    pm.expect(pm.response.text()).to.include(\"John foe\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response isbn & aisle logic\",function(){\r",
+							"    pm.expect(jsonData[0].isbn).to.eql(pm.collectionVariables.get(\"isbn\"));\r",
+							"    pm.expect(jsonData[0].aisle).to.eql(pm.collectionVariables.get(\"aisle\"));\r",
+							"    pm.expect(jsonData[0].isbn+jsonData[0].aisle).to.eql(pm.collectionVariables.get(\"book_id\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Library/GetBook.php?ID={{book_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Library",
+						"GetBook.php"
+					],
+					"query": [
+						{
+							"key": "ID",
+							"value": "{{book_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteBook1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validate the response statuc code is 200 OK\",function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.have.status(\"OK\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate the response status code of Post Request \",function(){\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate the response time is less than 500ms\",function(){\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response Content Type header\",function(){\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json;charset=UTF-8\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response must be valid and have a body\",function(){\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const schema ={\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"msg\": {\r",
+							"      \"type\": \"string\"\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"msg\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.test(\"Validate the response Json Schema\",function(){\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    pm.expect(tv4.validate(jsonData,schema)).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response properties\",function(){\r",
+							"    pm.expect(jsonData).to.have.property(\"msg\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response data type\",function(){\r",
+							"    pm.expect(jsonData).to.be.an(\"object\");\r",
+							"    pm.expect(jsonData.msg).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate the response values\",function(){\r",
+							"    pm.expect(jsonData.msg).to.eql(\"book is successfully deleted\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate body matches string\",function(){\r",
+							"    pm.expect(pm.response.text()).to.include(\"book is successfully deleted\");\r",
+							"});\r",
+							"\r",
+							"// unset/clear collection variables\r",
+							"pm.collectionVariables.clear();\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"ID\": \"{{book_id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Library/DeleteBook.php",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Library",
+						"DeleteBook.php"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
